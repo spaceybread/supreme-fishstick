@@ -1,5 +1,5 @@
-from gym import spaces
-from gym import Env
+from gymnasium import spaces
+from gymnasium import Env
 import numpy as np
 from make_maze import Maze
 
@@ -21,10 +21,10 @@ class MazeEnv(Env):
         self.maze_size = 10
         self.grid_size = 2 * self.maze_size + 1
 
-        self.observation_space = self.observation_space = spaces.Box(
-            0, 1,
+        self.observation_space = spaces.Box(
+            0, 255,
             shape=(1, self.grid_size, self.grid_size),
-            dtype=np.float32
+            dtype=np.uint8
         )
         self.action_space = spaces.Discrete(4)
 
@@ -67,22 +67,22 @@ class MazeEnv(Env):
             reward = -0.001
 
         truncated = self.current_steps >= self.max_steps
-        done = done or truncated
 
-        return self.get_obs(), reward, done, {}
+        return self.get_obs(), reward, done, truncated, {}
         
     def get_obs(self):
-        return (self.grid.reshape(1, self.grid_size, self.grid_size) / 9.0).astype(np.float32)
+        return (self.grid.reshape(1, self.grid_size, self.grid_size) * 28).astype(np.uint8)
     
-    def reset(self):
+    def reset(self, seed=None, options=None):
+        super().reset(seed=seed)
         self.current_steps = 0
         self.visited_cells = set()
         self.visited_cells.add((1, 1))
         maze = Maze(self.maze_size)
-        self.grid = np.array(maze.flatten(), dtype=np.int16)
+        self.grid = np.array(maze.flatten(), dtype=np.uint8)
         self.player_pos = [1, 1]
-        return self.get_obs()
-    
+        return self.get_obs(), {}
+        
     def render(self):
         ma = {0: ' ', 9: '#', 1: 'o', 2: 'x'}
         for i in range(self.grid_size):
