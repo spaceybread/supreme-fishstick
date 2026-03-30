@@ -7,6 +7,8 @@ class Maze:
         self.wall_symbol = '#'
         self.empt_symbol = ' '
         self.generate()
+        
+        self.out = self.get_2d_arr()
 
     def generate(self):
         self.h_walls = np.ones((self.size, self.size), dtype=bool)
@@ -58,11 +60,11 @@ class Maze:
         out[2 * self.size - 1][2 * self.size - 1] = 2
         
         # for x in out: print(*x)
-        
+        self.out = out
         return out
 
     def render_map(self):
-        arr = self.get_2d_arr()
+        arr = self.out
         
         ma = {9: '#', 0: ' ', 1: 'o', 2: 'x'}
         
@@ -70,3 +72,13 @@ class Maze:
             for j in range(len(arr[i])):
                 print(ma[arr[i][j]], end='')
             print()
+    
+    def flatten(self):
+        arr = self.out
+        out = []
+        
+        for x in arr:
+            for y in x:
+                out.append(y)
+        
+        return out
